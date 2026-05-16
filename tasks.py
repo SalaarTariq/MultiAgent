@@ -1,36 +1,45 @@
+from datetime import datetime
+from pathlib import Path
+
 from crewai import Task
+
 from agent import researcher, writer, proof_reader
 from tools import google_search_tool
+
+OUTPUT_DIR = Path(__file__).parent / "outputs"
+OUTPUT_DIR.mkdir(exist_ok=True)
+OUTPUT_PATH = OUTPUT_DIR / f"newsletter-{datetime.now():%Y%m%d-%H%M%S}.md"
 
 # Create tasks
 
 research_task = Task(
-    description=("Identify the next big trend in {topic}. Focus on pros, cons, and the overall narrative."),
+    description="Identify the next big trend in {topic}. Focus on pros, cons, and the overall narrative.",
     expected_output="A 3-paragraph report on {topic}.",
     tools=[google_search_tool],
-    agent=researcher
+    agent=researcher,
 )
 
 write_task = Task(
-    description=("""
-    Compose an insightful article on the topic: {topic}. Focus on the latest trends and how its impacting the industry.
-    This article should be digestible, easy to understand, engaging and positive.
-    """),
+    description=(
+        "Compose an insightful article on the topic: {topic}. Focus on the latest trends and how it's impacting the industry. "
+        "This article should be digestible, easy to understand, engaging and positive."
+    ),
     expected_output="A 4 paragraph long article on the topic: {topic}, formatted as markdown.",
     tools=[google_search_tool],
     agent=writer,
-    async_execution=False
+    async_execution=False,
 )
 
 proof_read_task = Task(
-    description=("""
-    Finalise an insightful article on the topic: {topic} which is already written by the writer. Focus on the information and how it is structured.
-    It should not have any mistakes and should be very easy to digest. Make sure to put sources of the information where they come from.
-    Also write 3 sources for further studying of the topic. This article should be digestible, easy to understand, engaging and positive.
-    """),
+    description=(
+        "Finalise an insightful article on the topic: {topic} which is already written by the writer. "
+        "Focus on the information and how it is structured. It should not have any mistakes and should be very easy to digest. "
+        "Make sure to put sources of the information where they come from. Also write 3 sources for further studying of the topic. "
+        "This article should be digestible, easy to understand, engaging and positive."
+    ),
     expected_output="A 4 paragraph long article on the topic: {topic}, formatted as markdown with all the relevant sources",
     tools=[google_search_tool],
     agent=proof_reader,
     async_execution=False,
-    output_file="newsletter.md"
+    output_file=str(OUTPUT_PATH),
 )

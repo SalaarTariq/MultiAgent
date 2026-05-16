@@ -1,16 +1,11 @@
 from crewai import Agent
-from langchain_groq import ChatGroq
-import os
-from tools import google_search_tool
-# llm = ChatGroq(
-#     model=model,
-#     verbose=True,
-#     temperature=0,
-#     groq_api_key=os.getenv("GROQ_API_KEY")
-# )
-llm = "groq/llama-3.1-8b-instant"
 
-#Agents
+from llm import get_llm
+from tools import google_search_tool
+
+llm = get_llm()
+
+# Agents
 
 researcher = Agent(
     role="Lead Research Analyst",
@@ -21,12 +16,11 @@ researcher = Agent(
     ),
     backstory=(
         "You are the upstream authority in the workflow. Your outputs define the factual boundaries "
-        "within which all other agents must operate. You are trained in critical thinking, source evaluation, "
-        "and analytical decomposition. You respond precisely to follow-up questions from the writing or "
-        "proofreading agents and correct factual misunderstandings when they arise. "
+        "within which all other agents must operate for the topic {topic}. You are trained in critical thinking, "
+        "source evaluation, and analytical decomposition. You respond precisely to follow-up questions from the "
+        "writing or proofreading agents and correct factual misunderstandings when they arise. "
         "You never perform stylistic edits or narrative writing."
     ),
-  
     memory=False,
     verbose=True,
     llm=llm,
@@ -47,13 +41,11 @@ writer = Agent(
         "agent and when to accept stylistic feedback from the proofreading agent. "
         "You do not introduce new facts unless explicitly validated by the research agent."
     ),
-   
     memory=False,
     verbose=True,
     llm=llm,
     tools=[google_search_tool],
     allow_delegation=True,
-
 )
 
 proof_reader = Agent(
@@ -68,10 +60,9 @@ proof_reader = Agent(
         "and reader experience. You collaborate by providing targeted feedback rather than rewriting entire sections. "
         "When encountering unclear or potentially inaccurate statements about {topic}, you escalate them instead of guessing."
     ),
-   
     memory=False,
     verbose=True,
     llm=llm,
     tools=[google_search_tool],
-    allow_delegation=True,
+    allow_delegation=False,  # final gate — should not delegate further
 )

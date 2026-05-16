@@ -4,10 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-crewai = "*"
-crewai-tools = "*"
-langchain-groq = "*"
-litellm = "*"
+crewai = "==1.7.2"
+crewai-tools = "==1.7.2"
+langchain-groq = "==1.1.1"
+litellm = "==1.80.11"
+python-dotenv = "*"
 
 [dev-packages]
 
